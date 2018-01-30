@@ -45,6 +45,10 @@ __appname__ = 'labelImg'
 
 # Utility functions and classes.
 
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 def have_qstring():
     '''p3/qt5 get rid of QString wrapper as py3 has native unicode str type'''
     return not (sys.version_info.major >= 3 or QT_VERSION_STR.startswith('5.'))
@@ -199,7 +203,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # Tzutalin 20160906 : Add file list and dock to move faster
         self.addDockWidget(Qt.RightDockWidgetArea, self.filedock)
         self.filedock.setFeatures(QDockWidget.DockWidgetFloatable)
-        
+
         self.dockFeatures = QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
 
@@ -301,7 +305,7 @@ class MainWindow(QMainWindow, WindowMixin):
         }
 
         edit = action('&Edit Label', self.editLabel,
-                      'Ctrl+E', 'edit', u'Modify the label of the selected Box',
+                      'e', 'edit', u'Modify the label of the selected Box',
                       enabled=False)
         self.editButton.setDefaultAction(edit)
 
@@ -608,7 +612,7 @@ class MainWindow(QMainWindow, WindowMixin):
         text = self.labelDialog.popUp(item.text())
         if text is not None:
             item.setText(text)
-            item.setBackground(generateColorByText(text))
+            item.setBackground(QColor(255, 255, 255, 100)) #generateColorByText(text))
             self.setDirty()
 
     # Tzutalin 20160906 : Add file list and dock to move faster
@@ -654,6 +658,7 @@ class MainWindow(QMainWindow, WindowMixin):
             shape = self.canvas.selectedShape
             if shape:
                 self.shapesToItems[shape].setSelected(True)
+                self.labelList.scrollToItem(self.shapesToItems[shape])
             else:
                 self.labelList.clearSelection()
         self.actions.delete.setEnabled(selected)
@@ -666,7 +671,7 @@ class MainWindow(QMainWindow, WindowMixin):
         item = HashableQListWidgetItem(shape.label)
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
         item.setCheckState(Qt.Checked)
-        item.setBackground(generateColorByText(shape.label))
+        item.setBackground(QColor(255, 255, 255, 100)) #generateColorByText(shape.label))
         self.itemsToShapes[item] = shape
         self.shapesToItems[shape] = item
         self.labelList.addItem(item)
@@ -692,6 +697,7 @@ class MainWindow(QMainWindow, WindowMixin):
             shape.close()
             s.append(shape)
 
+
             if line_color:
                 shape.line_color = QColor(*line_color)
             else:
@@ -701,6 +707,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 shape.fill_color = QColor(*fill_color)
             else:
                 shape.fill_color = generateColorByText(label)
+
 
             self.addLabel(shape)
 
